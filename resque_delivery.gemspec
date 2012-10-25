@@ -8,6 +8,7 @@ Gem::Specification.new do |gem|
   gem.homepage = 'http://github.com/chingor13/resque_delivery'
 
   gem.add_runtime_dependency 'actionmailer', '~> 3.0'
+  gem.add_runtime_dependency 'resque'
 
   gem.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   gem.files         = `git ls-files`.split("\n")
