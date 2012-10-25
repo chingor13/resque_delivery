@@ -28,3 +28,14 @@ You can configure 2 additional options in your resque_delivery_settings hash:
 
 * :queue - which resque queue to place the job in
 * :job_class - (String or Class) - The job that will be queued. It is recommended that you inherit from the `ResqueDelivery::SendMail` class.
+
+## Notes
+
+We serialize the Mail::Message object (via to_yaml and from_yaml) so that you can pass objects to your Mailer classes.  Other similar
+implementations of asynchronous mailing, queue the Mailer name with the mail parameters, building the email parts at send time. This 
+implementation allows our workers to be unaware of any data models or views that are required to build the email.  Additionally, no further 
+code changes are required to make your mails asynchronous (well, assuming you already have Resque configured).
+
+## Changelog
+
+* 0.0.1 - Initial Version
