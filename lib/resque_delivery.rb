@@ -7,6 +7,9 @@ class ResqueDelivery
     @delivery_method = options[:delivery_method]
     @queue = options[:queue] || :medium
     @job_class = options[:job_class] || SendMail
+    @job_class = @job_class.constantize if @job_class.is_a?(String)
+
+    @job_class.instance_variable_set(:@queue, @queue)
 
     raise SettingsError, "you must specify config.action_mailer.resque_delivery_settings to contain a :delivery_method" unless @delivery_method
   end
@@ -17,8 +20,10 @@ class ResqueDelivery
   end
 
   class SendMail
+    @queue = :medium
+
     class << self
-      def self.perform(delivery_method, mail_yaml)
+      def perform(delivery_method, mail_yaml)
         real_delivery_method(delivery_method).deliver!(build_message(mail_yaml))
       end
       protected
@@ -30,7 +35,7 @@ class ResqueDelivery
 
       def real_delivery_method(delivery_method)
         settings = ActionMailer::Base.send(:"#{delivery_method}_settings")
-        ActionMailer::Base.delivery_methods[delivery_method].new(settings)
+        ActionMailer::Base.delivery_methods[delivery_method.to_sym].new(settings)
       end
     end
   end
