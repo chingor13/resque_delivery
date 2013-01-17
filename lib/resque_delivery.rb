@@ -16,21 +16,21 @@ class ResqueDelivery
 
   def deliver!(mail)
     # serialize the mail object for later sending
-    Resque.enqueue_to(queue, job_class, delivery_method, mail.to_yaml)
+    Resque.enqueue_to(queue, job_class, delivery_method, mail.encoded)
   end
 
   class SendMail
     @queue = :medium
 
     class << self
-      def perform(delivery_method, mail_yaml)
-        real_delivery_method(delivery_method).deliver!(build_message(mail_yaml))
+      def perform(delivery_method, mail_text)
+        real_delivery_method(delivery_method).deliver!(build_message(mail_text))
       end
       protected
 
       # deserialize the mail object
-      def build_message(mail_yaml)
-        Mail::Message.from_yaml(mail_yaml)
+      def build_message(mail_text)
+        Mail.new(mail_text)
       end
 
       def real_delivery_method(delivery_method)
